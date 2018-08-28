@@ -127,6 +127,7 @@ public class Inicio extends javax.swing.JFrame {
         boolean sw = true;
         int i = 0;
         String EXP = jTextField1.getText();
+        int Parentesis = 0;
         while(i < EXP.length() && sw) {
             if (!OP.contains(EXP.substring(i, i+1))) {
                 if (!Alfabeto.contains(EXP.substring(i, i+1))) {
@@ -134,11 +135,10 @@ public class Inicio extends javax.swing.JFrame {
                 }
             }else{
                 boolean error = false;
-                int Parentesis = 0;
                 if (i<(EXP.length()-1)) {
                     switch(EXP.substring(i, i+1)){
                         case "|":
-                            if (OP.contains(EXP.substring(i+1, i+2))) {
+                            if (OP.contains(EXP.substring(i+1, i+2)) && !EXP.substring(i+1, i+2).equals("(")) {
                                 error = true;
                             }
                         break;
@@ -154,15 +154,12 @@ public class Inicio extends javax.swing.JFrame {
                         break;
                         case "(":
                             Parentesis++;
-                            if (OP.contains(EXP.substring(i+1, i+2))) {
+                            if (OP.contains(EXP.substring(i+1, i+2)) && !EXP.substring(i+1, i+2).equals("(")) {
                                 error = true;
                             }                        
                         break;
                         case ")":            
-                            Parentesis++;
-                            if (EXP.substring(i+1, i+2).equals("|") | EXP.substring(i+1, i+2).equals(")")) {
-                                error = true;
-                            }            
+                            Parentesis++;           
                         break;
                         case "+":
                             if (EXP.substring(i+1, i+2).equals("+") | EXP.substring(i+1, i+2).equals("*") | EXP.substring(i+1, i+2).equals("?")) {
@@ -171,7 +168,10 @@ public class Inicio extends javax.swing.JFrame {
                         break;
                     }
                 }else{
-                    if (EXP.substring(i, i+1).equals("+") | EXP.substring(i, i+1).equals("|") | EXP.substring(i, i+1).equals("(")) {
+                    if (EXP.substring(i, i+1).equals(")") | EXP.substring(i, i+1).equals("(")) {
+                        Parentesis++;
+                    }
+                    if (EXP.substring(i, i+1).equals("|") | EXP.substring(i, i+1).equals("(")) {
                         error=true;
                     }
                     if (Parentesis%2 != 0) {
@@ -179,7 +179,7 @@ public class Inicio extends javax.swing.JFrame {
                     }
                 }
                 if (error) {
-                    JOptionPane.showMessageDialog(null, "La expresion regular tiene errores lexicograficos.", "Automatas finitos", JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "La expresion regular tiene errores.", "Automatas finitos", JOptionPane.WARNING_MESSAGE);
                     sw = false;
                 }
             }
