@@ -5,7 +5,7 @@ Estos son las variables que he agregado y deben tener en cuenta.
 
 OP : Este es un array que guarda los caracteres especiales que vienen con una expresión regular, como son los paréntesis o el asterisco.
 
-#Alfabeto:#  array que almacena los caracteres del alfabeto.
+#Alfabeto: array que almacena los caracteres del alfabeto.
 
 jTableAFD --> Tabla para mostrar el AFD optimo
 
