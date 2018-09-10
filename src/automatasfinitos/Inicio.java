@@ -362,7 +362,7 @@ public class Inicio extends javax.swing.JFrame {
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
         if (!jTextField2.getText().equals("")) {
-
+            //SubConjuntos();
         }else{
             JOptionPane.showMessageDialog(null, "Llene el campo respectivo.", "Automatas finitos", JOptionPane.WARNING_MESSAGE);
     
@@ -457,7 +457,7 @@ public class Inicio extends javax.swing.JFrame {
             String[] E = T[Pos][T[0].length-1].split(",");
             for (int i = 0; i < E.length; i++) {
                 if (!C.contains(E[i])){
-                     TE = TE + "," + TransEpsilon(T,Integer.parseInt(E[i])+1,C);    
+                     TE = TE + "," + TransEpsilon(T,Integer.parseInt(E[i]),C);    
                 }             
             }
         }
@@ -468,7 +468,7 @@ public class Inicio extends javax.swing.JFrame {
         String MC = "";
             String[] CE = CTE.split(",");
             for (int i = 0; i < CE.length; i++){
-                String c = T[Integer.parseInt(CE[i])+1][Sim];
+                String c = T[Integer.parseInt(CE[i])][Sim];
                 if (c.length()>1){
                     String[] s = c.split(",");
                     for (int j = 0; j < s.length; j++) {
@@ -487,7 +487,7 @@ public class Inicio extends javax.swing.JFrame {
         if (!C.isEmpty()) {
             ArrayList<String> EP = new ArrayList<>();
            for (String c : C) {
-               TransEpsilon(T,Integer.parseInt(c)+1,EP);
+               TransEpsilon(T,Integer.parseInt(c),EP);
            }
            MC = MC + EP.get(0);
            for (int i = 1; i < EP.size(); i++) {
@@ -498,9 +498,9 @@ public class Inicio extends javax.swing.JFrame {
     }
     
     public void SubConjuntos(){
-        String[][] T = {{"","a","b","E"},{"0","-","-","1,7"},{"1","-","-","2,4"},{"2","3","-","-"},{"3","-","-","6"},{"4","-","5","-"},{"5","-","-","6"},{"6","-","-","1,7"},{"7","8","-","-"},{"8","-","9","-"},{"9","-","10","-"},{"10","-","-","-"}};
+        String[][] T = {{"0","-","-","1,7"},{"1","-","-","2,4"},{"2","3","-","-"},{"3","-","-","6"},{"4","-","5","-"},{"5","-","-","6"},{"6","-","-","1,7"},{"7","8","-","-"},{"8","-","9","-"},{"9","-","10","-"},{"10","-","-","-"}};
         Conjuntos = new ArrayList<>();
-        Conjuntos.add(TransEpsilon(T,1,new ArrayList<>()));
+        Conjuntos.add(TransEpsilon(T,0,new ArrayList<>()));
         ArrayList<String> Trans = new ArrayList<>();
         Trans.add("");
         int a = 0;
