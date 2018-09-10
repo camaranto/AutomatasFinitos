@@ -25,26 +25,16 @@ jTextField2 -->  Campo para escribir cadenas para comprobar la expresion regular
 
 jButton2 -->  Botón para activar el proceso de validación de la cadena.
  
-En el codigo esta, pero lo recalco de nuevo...
-
-Definen un Jtable:
-JTable table;
+ Existe un metodo que facilita motrar los datos en las tablas:
  
- Luego le asignan los respectivos datos apartir de un Object.
-
-Object[][] data ={
-{"A","A","B"},
-{"C", "C", ""}
-};
-
-Para facilitar esta parte, no es necesario que lo definan el TransD como object, sino que luego pásenlo. Ahora un vector para el nombre de las columnas.
-
-String[] columnNames = {"", "a", "b"};
-
-Con estos arreglos, se crea la tabla.
-     
-table = new JTable(data, columnNames);
-
-Y al final le asignan los datos a la tabla correspondiente a dicho proceso.
-
-jTableThompson.setModel(table.getModel());
+ DefTable(JTable T,String[][] Mat)
+ 
+ Con dichos argumentos. La matriz de Strings debe incluir el nombre de cada nodo en la primera columna.
+ 
+ Por ejemplo, la matriz seria de la siguiente forma:
+ 
+  A B C
+  B B D
+  C B C
+  D B E
+  E B C
