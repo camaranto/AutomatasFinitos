@@ -6,6 +6,7 @@
 package automatasfinitos;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 
@@ -17,6 +18,8 @@ public class Inicio extends javax.swing.JFrame {
 
     public static final ArrayList<String> OP = new ArrayList<>();
     public static ArrayList<String> Alfabeto;
+    String[] Abecedario = {"A","B","C","D","E","F","G","H","I","J","K","L","M","Ñ","O","P"};
+    public ArrayList<String> Conjuntos;
     JTable table;
     /**
      * Creates new form Inicio
@@ -321,8 +324,8 @@ public class Inicio extends javax.swing.JFrame {
 
     private void jTextField1KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField1KeyTyped
         // TODO add your handling code here:
-        if (!Character.isLetter(evt.getKeyChar()) && !OP.contains(evt.getKeyChar() + "")) {
-         evt.consume();
+        if (!Character.isLetter(evt.getKeyChar()) && !Character.isDigit(evt.getKeyChar()) && !OP.contains(evt.getKeyChar() + "")) {
+            evt.consume();
         }
     }//GEN-LAST:event_jTextField1KeyTyped
 
@@ -359,14 +362,14 @@ public class Inicio extends javax.swing.JFrame {
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
         if (!jTextField2.getText().equals("")) {
-           
+
         }else{
             JOptionPane.showMessageDialog(null, "Llene el campo respectivo.", "Automatas finitos", JOptionPane.WARNING_MESSAGE);
     
         }
     }//GEN-LAST:event_jButton2ActionPerformed
 
-    
+       
     public boolean ComprobarEXP(){
         boolean sw = true;
         int i = 0;
@@ -434,6 +437,7 @@ public class Inicio extends javax.swing.JFrame {
     
     String Alfabeto(){
         String A = "{";
+        Collections.sort(Alfabeto);
         A = A + " " + Alfabeto.get(0);
         for (int i = 1; i < Alfabeto.size(); i++) {
             A = A + ", " + Alfabeto.get(i);
@@ -441,6 +445,104 @@ public class Inicio extends javax.swing.JFrame {
         A = A + " }";
         return A;
     }
+            
+    String TransEpsilon(String[][] T,int Pos,ArrayList<String> C){
+        String TE = "" +  T[Pos][0];
+        if (!C.contains(T[Pos][0])) {
+            C.add(T[Pos][0]);   
+        }
+        //System.out.println(TE + "Actual");
+        //System.out.println(T[Pos][T[0].length-1] + "Trans EP - " + Pos);
+        if (!T[Pos][T[0].length-1].equals("-")) {
+            String[] E = T[Pos][T[0].length-1].split(",");
+            for (int i = 0; i < E.length; i++) {
+                if (!C.contains(E[i])){
+                     TE = TE + "," + TransEpsilon(T,Integer.parseInt(E[i])+1,C);    
+                }             
+            }
+        }
+        return TE;
+    }
+    
+    String MueveC(String[][] T,String CTE,int Sim,ArrayList<String> C){
+        String MC = "";
+            String[] CE = CTE.split(",");
+            for (int i = 0; i < CE.length; i++){
+                String c = T[Integer.parseInt(CE[i])+1][Sim];
+                if (c.length()>1){
+                    String[] s = c.split(",");
+                    for (int j = 0; j < s.length; j++) {
+                        if (!C.contains(s[j])) {
+                           C.add(s[j]);
+                        }
+                   }
+                }else{
+                    if (!c.equals("-")) {
+                        if (!C.contains(c)) {
+                           C.add(c);
+                        }   
+                    }
+                }
+            }
+        if (!C.isEmpty()) {
+            ArrayList<String> EP = new ArrayList<>();
+           for (String c : C) {
+               TransEpsilon(T,Integer.parseInt(c)+1,EP);
+           }
+           MC = MC + EP.get(0);
+           for (int i = 1; i < EP.size(); i++) {
+               MC = MC + ","  + EP.get(i);
+           }
+        }    
+        return MC;
+    }
+    
+    public void SubConjuntos(){
+        String[][] T = {{"","a","b","E"},{"0","-","-","1,7"},{"1","-","-","2,4"},{"2","3","-","-"},{"3","-","-","6"},{"4","-","5","-"},{"5","-","-","6"},{"6","-","-","1,7"},{"7","8","-","-"},{"8","-","9","-"},{"9","-","10","-"},{"10","-","-","-"}};
+        Conjuntos = new ArrayList<>();
+        Conjuntos.add(TransEpsilon(T,1,new ArrayList<>()));
+        ArrayList<String> Trans = new ArrayList<>();
+        Trans.add("");
+        int a = 0;
+        while(a < Conjuntos.size()){
+            for (int i = 0; i < Alfabeto.size(); i++) {
+                String Ti = MueveC(T,Conjuntos.get(a),(i+1),new ArrayList<>());
+                if (!Conjuntos.contains(Ti)) {
+                    Conjuntos.add(Ti);
+                    Trans.add("");
+                    Trans.set(a,Trans.get(a) + (Conjuntos.size()-1) + "-");
+                }else{
+                    Trans.set(a,Trans.get(a) + (Conjuntos.indexOf(Ti)) + "-");
+                }
+            }
+            a++;
+        }
+        String[][] Datos = new String[Conjuntos.size()][Alfabeto.size()+1];
+        for (int i = 0; i < Conjuntos.size(); i++) {
+            Datos[i][0] = Abecedario[i];
+        }
+        for (int i = 0; i < Trans.size(); i++) {
+            String[] c = Trans.get(i).split("-");
+            for (int j = 0; j < c.length; j++) {
+              Datos[i][(j+1)] = Abecedario[Integer.parseInt(c[j])];
+            }
+            jTextConjuntos.setText( jTextConjuntos.getText() + Abecedario[i] + " --> {" + Conjuntos.get(i) + "}" + "\n" );   
+        }
+        DefTable(jTableSubConjuntos,Datos);
+    }
+    
+    public void DefTable(JTable T,String[][] Mat){
+        String[] Columnas = new String[Alfabeto.size()+1];
+        Columnas[0] = " ";
+        for (int i = 0; i < Alfabeto.size(); i++) {
+           Columnas[i+1] = Alfabeto.get(i);
+        }
+        JTable M = new JTable(Mat, Columnas);
+        T.setModel(M.getModel());
+    }
+    
+    
+    
     
     /**
      * @param args the command line arguments
