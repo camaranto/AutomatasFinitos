@@ -9,13 +9,13 @@ package automatasfinitos;
  *
  * @author Pedro_Acevedo
  */
-public class AutomatasFinitos {
+public class Pair {
+    Object a;
+    Object b;
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        // TODO code application logic here
+    public Pair(Object a, Object b) {
+        this.a = a;
+        this.b = b;
     }
     
 }

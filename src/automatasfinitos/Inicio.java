@@ -7,6 +7,7 @@ package automatasfinitos;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Stack;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 
@@ -56,7 +57,53 @@ public class Inicio extends javax.swing.JFrame {
         setLocationRelativeTo(null);
         this.setResizable(false);
     }
-
+    private void Thompson(String ER){
+        if(true){
+            Stack<Integer> Pars = new Stack();
+            ArrayList<Pair> Pairs = new ArrayList();
+            String[] ERs = ER.split("");
+            for(int i=0;i < ERs.length;i++){
+                if(ERs[i].equals("(")){
+                    Pars.add(i);
+                }else if(ERs[i].equals(")")) {
+                    Pairs.add(new Pair(Pars.pop(),i));
+                }
+            }
+            ArrayList<String> Segments = Segment_OP(ER);
+            //System.out.println("no");
+            Segments.forEach((p) -> {
+                System.out.println(p);
+            });
+            
+            
+        }
+    }
+    
+    private ArrayList<String> Segment_OP(String ER){
+        int i=0;
+        String[] ERs = ER.split("");
+        ArrayList<String> Segments = new ArrayList();
+        ArrayList<String> Pars = new ArrayList();
+        Pars.add("(");
+        Pars.add(")");
+        while(i < ERs.length){
+            char s = ERs[i].charAt(0);
+            //if(Character.isLetter(s)){
+                if(Character.isLetter(s) && i+1 < ERs.length && !Character.isLetter(ER.charAt(i+1)) && 
+                        !Pars.contains(ERs[i+1])){
+                    Segments.add(ERs[i]+ERs[i+1]);
+                    i+=2;
+                }else if(Character.isLetter(s) && !Pars.contains(ERs[i+1])){
+                    Segments.add(ERs[i]);
+                    i++;
+                }else{
+                
+                }
+            //}  
+        }
+        return Segments;
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -344,6 +391,7 @@ public class Inicio extends javax.swing.JFrame {
                 jTextField2.setEnabled(true);
                 jButton2.setEnabled(true);
                 jTextAlfa.setText(Alfabeto());
+                //Thompson(jTextField1.getText());
             }    
         }else{
             JOptionPane.showMessageDialog(null, "Llene el campo respectivo.", "Automatas finitos", JOptionPane.WARNING_MESSAGE);
@@ -363,6 +411,13 @@ public class Inicio extends javax.swing.JFrame {
         // TODO add your handling code here:
         if (!jTextField2.getText().equals("")) {
             //SubConjuntos();
+            String[][] Mat = {{"A","B","A"},{"B","B","C"},{"C","B","D"},{"D","B","A"}};
+            if (Reconocimiento(Mat,jTextField2.getText())) {
+                jLabelSINO.setText("SI");
+            }else{
+                jLabelSINO.setText("NO");
+            }
+            jTextMueve.setText(T);
         }else{
             JOptionPane.showMessageDialog(null, "Llene el campo respectivo.", "Automatas finitos", JOptionPane.WARNING_MESSAGE);
     
@@ -540,7 +595,60 @@ public class Inicio extends javax.swing.JFrame {
         JTable M = new JTable(Mat, Columnas);
         T.setModel(M.getModel());
     }
+    String T = "";
+    int Mueve(int Nodo, String Letra,String[][] Mat){
+        int Sig = -1;
+        String M = Mat[Nodo][Alfabeto.indexOf(Letra)+1];
+        if (!M.equals("-")) {
+            int i = 0;
+            T = T + "==" + Letra +  "=> " + M +  " ";
+            while(i < Mat.length) {
+                if (Mat[i][0].equals(M)) {
+                    Sig = i;
+                    i = Mat.length;
+                }else{
+                    i++;
+                }
+            }
+        }
+        return Sig;
+    }
     
+    public boolean Reconocimiento(String[][] Mat,String Cadena){
+        boolean sw = true;
+        int j = 0;
+        while(sw && j < Cadena.length()){
+            if (!Alfabeto.contains(Cadena.substring(j, j+1))) {
+                sw = false;
+            }else{
+                j = j+1;
+            }
+        }
+        if (sw) {
+            int a = Mueve(0,Cadena.substring(0,1),Mat);
+            int i = 0;
+            T = Mat[0][0] + "";
+            while (i < Cadena.length() && sw) {
+                if (a!=-1) {
+                    a = Mueve(a,Cadena.substring(i, i+1),Mat);
+                    i++;
+                }else{
+                    sw = false;
+                }
+            }    
+            if ((i != Cadena.length() && sw)){
+                 sw = false;
+            }else{
+                if (a != (Mat.length-1)) {
+                    sw = false;
+                    T = "No llega al estado de finalización.";
+                }
+            }
+        }else{
+            T = "Esta cadena no pertenece al alfabeto.";
+        }
+        return sw;
+    } 
     
     
     
