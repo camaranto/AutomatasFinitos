@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.Stack;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
+import java.util.HashMap;
 
 /**
  *
@@ -21,7 +22,11 @@ public class Inicio extends javax.swing.JFrame {
     public static ArrayList<String> Alfabeto;
     String[] Abecedario = {"A","B","C","D","E","F","G","H","I","J","K","L","M","Ñ","O","P"};
     public ArrayList<String> Conjuntos;
+    String[][] Thompson,AFDOP,AFDNOP;
     JTable table;
+    int[][]MAT;
+    static int latestState = 0;
+    int Parentesis;
     /**
      * Creates new form Inicio
      */
@@ -38,72 +43,16 @@ public class Inicio extends javax.swing.JFrame {
         jTableThompson.setEnabled(false);
         jTextAlfa.setEnabled(false);
         jTextConjuntos.setEnabled(false);
-        jTextMueve.setEnabled(false);
+        jTextMueveOP.setEnabled(false);
         jTextSignificativos.setEnabled(false);
         jTextField2.setEnabled(false);
-        jButton2.setEnabled(false);
-        /* ASIGNAR DATOS A UN JTABLE.
-        //Array bidimensional de objetos con los datos de la tabla
-        Object[][] data ={
-        {"A","A","B"},
-        {"C", "C", ""}
-        };
-        //Array de ‘String’ con los titulos de las columnas
-        String[] columnNames = {"", "a", "b"};
-        //Creacion de la tabla
-        table = new JTable(data, columnNames);
-        jTableThompson.setModel(table.getModel());*/
-        
+        jTextMueveNOP.setEnabled(false);
+        jButton2.setEnabled(false);      
         setLocationRelativeTo(null);
         this.setResizable(false);
     }
-    private void Thompson(String ER){
-        if(true){
-            Stack<Integer> Pars = new Stack();
-            ArrayList<Pair> Pairs = new ArrayList();
-            String[] ERs = ER.split("");
-            for(int i=0;i < ERs.length;i++){
-                if(ERs[i].equals("(")){
-                    Pars.add(i);
-                }else if(ERs[i].equals(")")) {
-                    Pairs.add(new Pair(Pars.pop(),i));
-                }
-            }
-            ArrayList<String> Segments = Segment_OP(ER);
-            //System.out.println("no");
-            Segments.forEach((p) -> {
-                System.out.println(p);
-            });
-            
-            
-        }
-    }
     
-    private ArrayList<String> Segment_OP(String ER){
-        int i=0;
-        String[] ERs = ER.split("");
-        ArrayList<String> Segments = new ArrayList();
-        ArrayList<String> Pars = new ArrayList();
-        Pars.add("(");
-        Pars.add(")");
-        while(i < ERs.length){
-            char s = ERs[i].charAt(0);
-            //if(Character.isLetter(s)){
-                if(Character.isLetter(s) && i+1 < ERs.length && !Character.isLetter(ER.charAt(i+1)) && 
-                        !Pars.contains(ERs[i+1])){
-                    Segments.add(ERs[i]+ERs[i+1]);
-                    i+=2;
-                }else if(Character.isLetter(s) && !Pars.contains(ERs[i+1])){
-                    Segments.add(ERs[i]);
-                    i++;
-                }else{
-                
-                }
-            //}  
-        }
-        return Segments;
-    }
-    
+    //
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -140,12 +89,16 @@ public class Inicio extends javax.swing.JFrame {
         jButton2 = new javax.swing.JButton();
         jLabelSINO = new javax.swing.JLabel();
         jScrollPane7 = new javax.swing.JScrollPane();
-        jTextMueve = new javax.swing.JTextArea();
+        jTextMueveOP = new javax.swing.JTextArea();
+        jScrollPane8 = new javax.swing.JScrollPane();
+        jTextMueveNOP = new javax.swing.JTextArea();
+        jLabel10 = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Automatas Finitos");
-        setMaximumSize(new java.awt.Dimension(800, 600));
-        setMinimumSize(new java.awt.Dimension(700, 600));
+        setMaximumSize(new java.awt.Dimension(1280, 720));
+        setMinimumSize(new java.awt.Dimension(1280, 720));
         setPreferredSize(new java.awt.Dimension(600, 600));
 
         jTextField1.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
@@ -260,106 +213,139 @@ public class Inicio extends javax.swing.JFrame {
         });
 
         jLabelSINO.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jLabelSINO.setText("SI O NO");
+        jLabelSINO.setText("--");
 
-        jTextMueve.setEditable(false);
-        jTextMueve.setColumns(1);
-        jTextMueve.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jTextMueve.setLineWrap(true);
-        jTextMueve.setRows(1);
-        jTextMueve.setTabSize(1);
-        jTextMueve.setMinimumSize(new java.awt.Dimension(433, 2331));
-        jScrollPane7.setViewportView(jTextMueve);
+        jTextMueveOP.setEditable(false);
+        jTextMueveOP.setColumns(1);
+        jTextMueveOP.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        jTextMueveOP.setRows(1);
+        jTextMueveOP.setTabSize(1);
+        jTextMueveOP.setMinimumSize(new java.awt.Dimension(433, 2331));
+        jScrollPane7.setViewportView(jTextMueveOP);
+
+        jTextMueveNOP.setEditable(false);
+        jTextMueveNOP.setColumns(1);
+        jTextMueveNOP.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        jTextMueveNOP.setRows(1);
+        jTextMueveNOP.setTabSize(1);
+        jTextMueveNOP.setMinimumSize(new java.awt.Dimension(433, 2331));
+        jScrollPane8.setViewportView(jTextMueveNOP);
+
+        jLabel10.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        jLabel10.setText("CON AFD NO OPTIMO:");
+
+        jLabel11.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        jLabel11.setText("CON AFD OPTIMO:");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(36, 36, 36)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jTextField1)
-                            .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel9)
-                            .addComponent(jTextField2)
-                            .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabelSINO, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jScrollPane7))
+                        .addGap(36, 36, 36)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(jTextField1)
+                                .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabel9)
+                                .addComponent(jTextField2)
+                                .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jScrollPane8, javax.swing.GroupLayout.Alignment.TRAILING))
+                            .addComponent(jLabel10)
+                            .addComponent(jLabel11)
+                            .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 181, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(116, 116, 116)
+                        .addComponent(jLabelSINO)))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
                         .addGap(40, 40, 40)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 174, Short.MAX_VALUE)
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 174, Short.MAX_VALUE)
-                                .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jScrollPane2)
-                            .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 173, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 202, Short.MAX_VALUE)
+                            .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 650, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(38, 38, 38)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 650, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 650, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 55, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel4)
+                            .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 173, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(181, 181, 181))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 192, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jScrollPane6))))
-                .addGap(0, 534, Short.MAX_VALUE))
+                            .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addContainerGap())))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(285, 285, 285)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 641, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(13, 13, 13)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel2)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel4)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel3)
-                            .addComponent(jLabel4))
+                        .addComponent(jScrollPane2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel6)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel8)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel5)
-                            .addComponent(jLabel6)
-                            .addComponent(jLabel9)))
+                        .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jLabel7)
-                                    .addComponent(jLabelSINO))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
-                                    .addComponent(jScrollPane7)))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel8)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(35, 35, 35)
+                        .addComponent(jLabel9)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(46, Short.MAX_VALUE))
+                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabelSINO)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 29, Short.MAX_VALUE)
+                        .addComponent(jLabel10)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
+                        .addComponent(jLabel11)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel5)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel7)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(46, 46, 46))
         );
 
         pack();
@@ -381,16 +367,29 @@ public class Inicio extends javax.swing.JFrame {
         if (!jTextField1.getText().equals("")) {
             Alfabeto = new ArrayList<>();
             if (ComprobarEXP()) {
+                Reinicio();
                 jTableAFD.setEnabled(true);
                 jTableSubConjuntos.setEnabled(true);
                 jTableThompson.setEnabled(true);
                 jTextAlfa.setEnabled(true);
                 jTextConjuntos.setEnabled(true);
-                jTextMueve.setEnabled(true);
+                jTextMueveOP.setEnabled(true);
                 jTextSignificativos.setEnabled(true);
                 jTextField2.setEnabled(true);
-                jButton2.setEnabled(true);
+                jTextMueveNOP.setEnabled(true);
+                jButton2.setEnabled(true);              
                 jTextAlfa.setText(Alfabeto());
+                if (Alfabeto.size() > 7) {
+                    jTableAFD.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+                    jTableSubConjuntos.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+                    jTableThompson.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+                }else{
+                    jTableAFD.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
+                    jTableSubConjuntos.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
+                    jTableThompson.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
+                }
+                AFDNOP = SubConjuntos();
+                estSig(AFDNOP);
                 //Thompson(jTextField1.getText());
             }    
         }else{
@@ -411,25 +410,39 @@ public class Inicio extends javax.swing.JFrame {
         // TODO add your handling code here:
         if (!jTextField2.getText().equals("")) {
             //SubConjuntos();
-            String[][] Mat = {{"A","B","A"},{"B","B","C"},{"C","B","D"},{"D","B","A"}};
-            if (Reconocimiento(Mat,jTextField2.getText())) {
+            if (Reconocimiento(AFDOP,jTextField2.getText())) {
                 jLabelSINO.setText("SI");
             }else{
                 jLabelSINO.setText("NO");
             }
-            jTextMueve.setText(T);
+            jTextMueveOP.setText(TM);
+            TM="";
+            if (Reconocimiento(AFDNOP,jTextField2.getText())) {
+                jLabelSINO.setText("SI");
+            }else{
+                jLabelSINO.setText("NO");
+            }
+            jTextMueveNOP.setText(TM);
         }else{
             JOptionPane.showMessageDialog(null, "Llene el campo respectivo.", "Automatas finitos", JOptionPane.WARNING_MESSAGE);
-    
         }
     }//GEN-LAST:event_jButton2ActionPerformed
-
+    
+    public void Reinicio(){
+        jTextAlfa.setText("");
+        jTextConjuntos.setText("");
+        jTextMueveOP.setText("");
+        jTextSignificativos.setText("");
+        jTextField2.setText("");
+        jTextMueveNOP.setText("");
+        jLabelSINO.setText("--");
+    }
        
     public boolean ComprobarEXP(){
         boolean sw = true;
         int i = 0;
         String EXP = jTextField1.getText();
-        int Parentesis = 0;
+        Parentesis = 0;
         while(i < EXP.length() && sw) {
             if (!OP.contains(EXP.substring(i, i+1))) {
                 if (!Alfabeto.contains(EXP.substring(i, i+1))) {
@@ -500,7 +513,10 @@ public class Inicio extends javax.swing.JFrame {
         A = A + " }";
         return A;
     }
-            
+    
+    
+    // METODO DE SUBCONJUNTOS.
+        
     String TransEpsilon(String[][] T,int Pos,ArrayList<String> C){
         String TE = "" +  T[Pos][0];
         if (!C.contains(T[Pos][0])) {
@@ -552,7 +568,7 @@ public class Inicio extends javax.swing.JFrame {
         return MC;
     }
     
-    public void SubConjuntos(){
+    public String[][] SubConjuntos(){
         String[][] T = {{"0","-","-","1,7"},{"1","-","-","2,4"},{"2","3","-","-"},{"3","-","-","6"},{"4","-","5","-"},{"5","-","-","6"},{"6","-","-","1,7"},{"7","8","-","-"},{"8","-","9","-"},{"9","-","10","-"},{"10","-","-","-"}};
         Conjuntos = new ArrayList<>();
         Conjuntos.add(TransEpsilon(T,0,new ArrayList<>()));
@@ -584,9 +600,78 @@ public class Inicio extends javax.swing.JFrame {
             jTextConjuntos.setText( jTextConjuntos.getText() + Abecedario[i] + " --> {" + Conjuntos.get(i) + "}" + "\n" );   
         }
         DefTable(jTableSubConjuntos,Datos);
+        return Datos;
     }
+
+    // METODO DE ESTADOS SIGNIFICATIVOS
     
-    public void DefTable(JTable T,String[][] Mat){
+    public void estSig(String[][] mat) {
+        jTextSignificativos.setText("");
+        String[][] T = {{"0", "-", "-", "1,7"}, {"1", "-", "-", "2,4"}, {"2", "3", "-", "-"}, {"3", "-", "-", "6"}, {"4", "-", "5", "-"}, {"5", "-", "-", "6"}, {"6", "-", "-", "1,7"}, {"7", "8", "-", "-"}, {"8", "-", "9", "-"}, {"9", "-", "10", "-"}, {"10", "-", "1", "-"}};
+        ArrayList<String> est_sig = new ArrayList<>();
+        String[][] datos;
+        String[][] aux3 = new String[Conjuntos.size()][Alfabeto.size() + 1];
+        for (int i = 0; i < Conjuntos.size(); i++) {
+            System.arraycopy(mat[i], 0, aux3[i], 0, Alfabeto.size() + 1);
+        }
+        String[] aux2 = new String[Abecedario.length];
+        int cont = 0;
+        for (int i = 0; i < Conjuntos.size(); i++) {
+            String aux[] = Conjuntos.get(i).split(",");
+            String add = "";
+            for (String aux1 : aux) {
+                if (!T[Integer.parseInt(aux1)][1].equals("-") | !T[Integer.parseInt(aux1)][2].equals("-")) {
+                    if (add.equals("")) {
+                        add = add + aux1;
+                    } else {
+                        add = add + "," + aux1;
+                    }
+                }
+            }
+            if (exist(est_sig, add, aux3, Conjuntos.size(), Alfabeto.size() + 1, i)) {
+                est_sig.add("Est_sig(" + Abecedario[i] + ")={" + add + "}-> eliminar");
+                jTextSignificativos.setText(jTextSignificativos.getText() + est_sig.get(est_sig.size() - 1) + "\n");
+            } else {
+                est_sig.add(add);
+                aux2[cont] = Abecedario[i];
+                cont++;
+                jTextSignificativos.setText(jTextSignificativos.getText() + "Est_sig(" + Abecedario[i] + ")= {" + add + "}" + "\n");
+            }
+        }
+        AFDOP = new String[cont][Alfabeto.size() + 1];
+        for (int i = 0; i < cont; i++) {
+            AFDOP[i][0] = aux2[i];
+            for (int j = 0; j < Conjuntos.size(); j++) {
+                if (aux3[j][0].equals(aux2[i])) {
+                    for (int k = 0; k < Alfabeto.size(); k++) {
+                        AFDOP[i][k + 1] = aux3[j][k + 1];
+                    }
+                }
+            }
+        }        
+        DefTable(jTableAFD, AFDOP);
+    }
+
+    boolean exist(ArrayList<String> a, String b, String[][] c, int fil, int col, int d) {
+        for (int i = 0; i < a.size(); i++) {
+            if (a.get(i).equals(b)) {
+                for (int j = 0; j < fil; j++) {
+                    for (int k = 1; k < col; k++) {
+                        if (c[j][k].equals(Abecedario[d])) {
+                            c[j][k] = Abecedario[i];
+                            System.out.println(Abecedario[d] + "->" + Abecedario[i]);
+                        }
+                    }
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    //DEFINICION DE TABLA.
+    
+    public JTable DefTable(JTable T,String[][] Mat){
         String[] Columnas = new String[Alfabeto.size()+1];
         Columnas[0] = " ";
         for (int i = 0; i < Alfabeto.size(); i++) {
@@ -594,14 +679,19 @@ public class Inicio extends javax.swing.JFrame {
         }
         JTable M = new JTable(Mat, Columnas);
         T.setModel(M.getModel());
+        return T;
     }
-    String T = "";
+    String TM = "";
+    
+
+// RECONOCIMIENTO.
+    
     int Mueve(int Nodo, String Letra,String[][] Mat){
         int Sig = -1;
         String M = Mat[Nodo][Alfabeto.indexOf(Letra)+1];
         if (!M.equals("-")) {
             int i = 0;
-            T = T + "==" + Letra +  "=> " + M +  " ";
+            TM = TM + "--" + Letra +  "-> " + M +  " ";
             while(i < Mat.length) {
                 if (Mat[i][0].equals(M)) {
                     Sig = i;
@@ -627,7 +717,7 @@ public class Inicio extends javax.swing.JFrame {
         if (sw) {
             int a = Mueve(0,Cadena.substring(0,1),Mat);
             int i = 0;
-            T = Mat[0][0] + "";
+            TM = Mat[0][0] + "";
             while (i < Cadena.length() && sw) {
                 if (a!=-1) {
                     a = Mueve(a,Cadena.substring(i, i+1),Mat);
@@ -641,11 +731,11 @@ public class Inicio extends javax.swing.JFrame {
             }else{
                 if (a != (Mat.length-1)) {
                     sw = false;
-                    T = "No llega al estado de finalización.";
+                    TM = "No llega al estado de finalización.";
                 }
             }
         }else{
-            T = "Esta cadena no pertenece al alfabeto.";
+            TM = "Esta cadena no pertenece al alfabeto.";
         }
         return sw;
     } 
@@ -691,6 +781,8 @@ public class Inicio extends javax.swing.JFrame {
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -707,6 +799,7 @@ public class Inicio extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JScrollPane jScrollPane7;
+    private javax.swing.JScrollPane jScrollPane8;
     private javax.swing.JTable jTableAFD;
     private javax.swing.JTable jTableSubConjuntos;
     private javax.swing.JTable jTableThompson;
@@ -714,7 +807,8 @@ public class Inicio extends javax.swing.JFrame {
     private javax.swing.JTextArea jTextConjuntos;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextArea jTextMueve;
+    private javax.swing.JTextArea jTextMueveNOP;
+    private javax.swing.JTextArea jTextMueveOP;
     private javax.swing.JTextArea jTextSignificativos;
     // End of variables declaration//GEN-END:variables
 }
