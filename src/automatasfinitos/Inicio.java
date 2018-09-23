@@ -20,11 +20,12 @@ public class Inicio extends javax.swing.JFrame {
 
     public static final ArrayList<String> OP = new ArrayList<>();
     public static ArrayList<String> Alfabeto;
+    private HashMap<String,Integer> hs = new HashMap();
     String[] Abecedario = {"A","B","C","D","E","F","G","H","I","J","K","L","M","Ñ","O","P"};
     public ArrayList<String> Conjuntos;
     String[][] Thompson,AFDOP,AFDNOP;
     JTable table;
-    int[][]MAT;
+    String[][]MAT;
     static int latestState = 0;
     int Parentesis;
     /**
@@ -50,6 +51,307 @@ public class Inicio extends javax.swing.JFrame {
         jButton2.setEnabled(false);      
         setLocationRelativeTo(null);
         this.setResizable(false);
+    }
+    
+    private void Thompson(String ER){
+        if(true){
+            Stack<Integer> Pars = new Stack();
+            ArrayList<Pair> Pairs = new ArrayList();
+            String[] ERs = ER.split("");
+            for(int i=0;i < ERs.length;i++){
+                if(ERs[i].equals("(")){
+                    Pars.add(i);
+                }else if(ERs[i].equals(")")) {
+                    Pairs.add(new Pair(Pars.pop(),i));
+                }
+            }
+            hs = Columns(Alfabeto());
+            MAT = new String[50][hs.size()];
+            RideER(ER,0, Pairs);
+            /*ArrayList<String> Segments = Segment_OP(ER);
+            //System.out.println("no");
+            Segments.forEach((p) -> {
+                System.out.println(p);
+            });*/
+        }
+    }
+    private HashMap<String,Integer> Columns(String alp){
+        HashMap<String,Integer> h = new HashMap();
+        String[] alpha = alp.substring(2,alp.length()-2).split(", ");
+        for(int i=0;i < alpha.length ; i++){
+            h.put(alpha[i], i);
+        }
+        h.put("ε",h.size());
+        return h;
+    }
+    
+    
+    private void RideER(String ER,int i, ArrayList<Pair> Pars){
+        if(i == ER.length()){
+            return;
+        }else if(Character.isLetter(ER.charAt(i))){
+            if((i+1 < ER.length() && Character.isLetter(ER.charAt(i+1))) | i+1 == ER.length()
+                    | (i+1 < ER.length() && ER.substring(i+1,i+2).equals("(")) ){
+                //MAT[latestState][hs.get(Character.toString(s))] = latestState + 1;
+                basic(latestState,ER.substring(i, i+1));
+                latestState++;
+                RideER(ER,i+1, Pars);
+            }else if((i+1 < ER.length() && ER.substring(i+1,i+2).equals("*"))){
+                int tmpStart = latestState;
+                epsilon(latestState);
+                latestState++;
+                RideER(ER.substring(i,i+1),0,Pars);
+                epsilon(latestState,tmpStart);
+                epsilon(latestState);
+                epsilon(tmpStart,latestState);
+                latestState++;
+                RideER(ER,i+2,Pars);
+            }else if(i+1 < ER.length() && ER.substring(i+1,i+2).equals("+")){
+                int tmpStart = latestState;
+                epsilon(latestState);
+                latestState++;
+                RideER(ER.substring(i,i+1),0,Pars);
+                epsilon(latestState,tmpStart);
+                epsilon(latestState);
+                //epsilon(tmpStart,latestState);
+                latestState++;
+                RideER(ER,i+2,Pars);
+            }else if(i+1 < ER.length() && ER.substring(i+1,i+2).equals("?")){
+                int tmpStart = latestState;
+                epsilon(latestState);
+                latestState++;
+                RideER(ER.substring(i,i+1),0,Pars);
+                epsilon(latestState);
+                epsilon(tmpStart,latestState);
+                latestState++;
+                RideER(ER,i+2,Pars);
+            }
+        //WITH PARENTESIS    
+        }else if(ER.substring(i,i+1).equals("(")){
+            int j = couple(Pars,i);
+            if((j+1 < ER.length() &&  Character.isLetter(ER.charAt(j+1))) | j+1 == ER.length()
+                    | (j+1 < ER.length() && ER.substring(j+1,j+2).equals("("))){
+                if(ER.substring(i, j).contains("|")){
+                    //System.out.println("loop");
+                    String[] operands = ER.substring(i+1, j).replace("|", "-").split("-");
+                    int tmpStart = latestState;
+                    epsilon(latestState);
+                    latestState++;
+                    RideER(operands[0],0,Pars);
+                    int tmpa = latestState;
+                    epsilon(tmpStart,latestState);
+                    latestState++;
+                    RideER(operands[1],0,Pars);
+                    epsilon(latestState);
+                    epsilon(tmpa,latestState);
+                    latestState++;
+                    RideER(ER,j+1,Pars);
+                }
+            //OPTIONAL
+            }else if(j+1 < ER.length() && ER.substring(j+1,j+2).equals("?")){
+                if(!ER.substring(i+1, j).contains("|")){
+                    int tmpStart = latestState;
+                    epsilon(latestState);
+                    latestState++;
+                    RideER(ER.substring(i+1,j),0,Pars);
+                    epsilon(latestState);
+                    epsilon(tmpStart,latestState);
+                    latestState++;
+                    RideER(ER,j+2,Pars);
+                }else {
+                    int tmpStart = latestState;
+                    epsilon(latestState);
+                    latestState++;
+                    
+                    String[] operands = ER.substring(i+1, j).replace("|", "-").split("-");
+                    int tmpStart1 = latestState;
+                    epsilon(latestState);
+                    latestState++;
+                    RideER(operands[0],0,Pars);
+                    int tmpa1 = latestState;
+                    epsilon(tmpStart1,latestState);
+                    latestState++;
+                    RideER(operands[1],0,Pars);
+                    epsilon(latestState);
+                    epsilon(tmpa1,latestState);
+                    latestState++;
+                    
+                    epsilon(latestState);
+                    epsilon(tmpStart,latestState);
+                    latestState++;
+                    RideER(ER,j+2,Pars);
+                }
+            //AND
+            }else if(j+1 < ER.length() && ER.substring(j+1,j+2).equals("*")){
+                if(!ER.substring(i+1, j).contains("|")){
+                    int tmpStart = latestState;
+                    epsilon(latestState);
+                    latestState++;
+                    RideER(ER.substring(i+1,j),0,Pars);
+                    epsilon(latestState,tmpStart);
+                    epsilon(latestState);
+                    epsilon(tmpStart,latestState);
+                    latestState++;
+                    RideER(ER,j+2,Pars);
+                }else{
+                    int tmpStart = latestState;
+                    epsilon(latestState);
+                    latestState++;
+                    
+                    String[] operands = ER.substring(i+1, j).replace("|", "-").split("-");
+                    int tmpStart1 = latestState;
+                    epsilon(latestState);
+                    latestState++;
+                    RideER(operands[0],0,Pars);
+                    int tmpa1 = latestState;
+                    epsilon(tmpStart1,latestState);
+                    latestState++;
+                    RideER(operands[1],0,Pars);
+                    epsilon(latestState);
+                    epsilon(tmpa1,latestState);
+                    latestState++;
+                    
+                    epsilon(latestState,tmpStart);
+                    epsilon(latestState);
+                    epsilon(tmpStart,latestState);
+                    latestState++;
+                    RideER(ER,j+2,Pars);
+                }
+            //OR
+            }else if(j+1 < ER.length() && ER.substring(j+1,j+2).equals("+")){
+                if(!ER.substring(i+1, j).contains("|")){
+                    int tmpStart = latestState;
+                    epsilon(latestState);
+                    latestState++;
+                    RideER(ER.substring(i+1,j),0,Pars);
+                    epsilon(latestState,tmpStart);
+                    epsilon(latestState);
+                    //epsilon(tmpStart,latestState);
+                    latestState++;
+                    RideER(ER,j+2,Pars);
+                }else{
+                    int tmpStart = latestState;
+                    epsilon(latestState);
+                    latestState++;
+                    
+                    String[] operands = ER.substring(i+1, j).replace("|", "-").split("-");
+                    int tmpStart1 = latestState;
+                    epsilon(latestState);
+                    latestState++;
+                    RideER(operands[0],0,Pars);
+                    int tmpa1 = latestState;
+                    epsilon(tmpStart1,latestState);
+                    latestState++;
+                    RideER(operands[1],0,Pars);
+                    epsilon(latestState);
+                    epsilon(tmpa1,latestState);
+                    latestState++;
+                    
+                    epsilon(latestState,tmpStart);
+                    epsilon(latestState);
+                    //epsilon(tmpStart,latestState);
+                    latestState++;
+                    RideER(ER,j+2,Pars);
+                }
+            }
+        }
+    }
+    private int couple(ArrayList<Pair> pars, int a){
+        int b = 0;
+        for(Pair p : pars){
+            if(Integer.parseInt(p.a.toString()) == a){
+                b = Integer.parseInt(p.b.toString());
+                break;
+            }
+        }
+        return b;
+    }
+    
+    private void epsilon(int latestState){
+        if(MAT[latestState][hs.get("ε")] == null){
+            MAT[latestState][hs.get("ε")] =(latestState + 1) + "";
+        }else{
+            MAT[latestState][hs.get("ε")] = MAT[latestState][hs.get("ε")] + ","  + (latestState + 1);
+        }
+        
+    }
+    private void epsilon(int i, int latestState){
+        if(MAT[i][hs.get("ε")] == null){
+            MAT[i][hs.get("ε")] = (latestState+1)+"";
+        }else{
+            MAT[i][hs.get("ε")] = MAT[i][hs.get("ε")] + "," + (latestState +1);
+        }
+        
+    }
+    
+    /*private void RideER(String ER){
+        int i=0;
+        int latestState = 0;
+        String[] ERs = ER.split("");
+        ArrayList<String> Pars = new ArrayList();
+        hs = Columns(Alfabeto());
+        MAT = new int[50][hs.size()];
+        Pars.add("(");
+        Pars.add(")");
+        while(i < ERs.length){
+            char s = ERs[i].charAt(0);
+            //if(Character.isLetter(s)){
+                if(Character.isLetter(s) && i+1 < ERs.length && !Character.isLetter(ER.charAt(i+1)) && 
+                        !Pars.contains(ERs[i+1])){
+                    Segments.add(ERs[i]+ERs[i+1]);
+                    i+=2;
+                }else if(Character.isLetter(s) && !Pars.contains(ERs[i+1])){
+                    Segments.add(ERs[i]);
+                    i++;
+                }else{
+                
+                }
+            //}
+            if(Character.isLetter(s)){
+                if((i+1 < ERs.length && Character.isLetter(ERs[i+1].charAt(0))) | i+1 == ERs.length){
+                    MAT[latestState][hs.get(Character.toString(s))] = latestState + 1;
+                    latestState++;
+                    i++;
+                }else{
+                
+                }
+            }else{
+                
+            }
+        }
+        //System.out.println("no");
+    }*/
+    
+    private void basic(int latestState, String ER){
+        if(MAT[latestState][hs.get(ER)] == null){
+            MAT[latestState][hs.get(ER)] = (latestState + 1) + "";
+        }else{
+            MAT[latestState][hs.get(ER)] = MAT[latestState][hs.get(ER)] + "," +  (latestState + 1);
+        }
+    }
+    private boolean isAtomic(String ER){
+        return !((ER.contains("|") | (ER.contains("?"))) |
+                (ER.contains("+")) | (ER.contains("*")));
+    }
+    
+    private void printMAT(int latestState){
+        System.out.print("  ");
+        hs.keySet().forEach((k) -> {
+            System.out.print(k + " ");
+        });
+        System.out.println();
+        for(int j = 0; j <= latestState;j++){
+            System.out.print(j + " ");
+            for(int k = 0; k < hs.size();k++){
+                if(MAT[j][k] == null){
+                    System.out.print(0 + " ");
+                }else{
+                    System.out.print(MAT[j][k] + " ");
+                }
+                
+            }
+            System.out.println();
+        }
     }
     
     //
@@ -379,6 +681,9 @@ public class Inicio extends javax.swing.JFrame {
                 jTextMueveNOP.setEnabled(true);
                 jButton2.setEnabled(true);              
                 jTextAlfa.setText(Alfabeto());
+                Thompson(jTextField1.getText());
+                printMAT(latestState);
+                latestState = 0;
                 if (Alfabeto.size() > 7) {
                     jTableAFD.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
                     jTableSubConjuntos.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
